@@ -37,7 +37,7 @@ class AlbumsHandler {
     await this._service.editAlbumById(id, request.payload);
     return {
       status: 'success',
-      message: 'Catatan berhasil diperbarui',
+      message: 'Album berhasil diperbarui',
     };
   }
 
@@ -47,7 +47,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Catatan berhasil dihapus',
+      message: 'Album berhasil dihapus',
     };
   }
 }
