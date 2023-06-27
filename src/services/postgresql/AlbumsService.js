@@ -9,7 +9,7 @@ class AlbumsService {
   }
 
   async addAlbum({ name, year }) {
-    const id = nanoid(16);
+    const id = `album-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
 
@@ -35,7 +35,7 @@ class AlbumsService {
     if (!albumResult.rows.length) throw new NotFoundError('Album tidak ditemukan');
 
     const querySongs = {
-      text: 'SELECT songs.id, songs.title, songs.performer FROM songs LEFT JOIN albums ON songs."albumId" = albums.id WHERE songs."albumId" = $1;',
+      text: 'SELECT songs.id, songs.title, songs.performer FROM songs LEFT JOIN albums ON songs.album_id = albums.id WHERE songs.album_id = $1;',
       values: [id],
     };
     const songsResult = await this._pool.query(querySongs);

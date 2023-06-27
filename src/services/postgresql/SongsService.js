@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { mapDetailSongToModel } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -11,7 +12,7 @@ class SongsService {
   async addSong({
     title, year, genre, performer, duration, albumId,
   }) {
-    const id = nanoid(16);
+    const id = `song-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
 
@@ -47,7 +48,7 @@ class SongsService {
 
   async getSongById(id) {
     const query = {
-      text: 'SELECT id, title, year, performer, genre, duration, "albumId" FROM songs WHERE id = $1',
+      text: 'SELECT id, title, year, performer, genre, duration, album_id FROM songs WHERE id = $1',
       values: [id],
     };
 
@@ -55,7 +56,7 @@ class SongsService {
 
     if (!rowCount) throw new NotFoundError('Lagu tidak ditemukan');
 
-    return rows[0];
+    return rows.map(mapDetailSongToModel)[0];
   }
 
   async editSongById(id, {
@@ -63,7 +64,7 @@ class SongsService {
   }) {
     const updatedAt = new Date().toISOString();
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, genre =$3, performer =$4, duration =$5, "albumId" =$6, updated_at = $7 WHERE id = $8 RETURNING id',
+      text: 'UPDATE songs SET title = $1, year = $2, genre =$3, performer =$4, duration =$5, album_id =$6, updated_at = $7 WHERE id = $8 RETURNING id',
       values: [title, year, genre, performer, duration, albumId, updatedAt, id],
     };
 
