@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+const JWT = require('@hapi/jwt');
 
 // albums
 const albums = require('./api/albums');
@@ -19,14 +20,40 @@ const usersValidator = require('./validator/users');
 // exception
 const ClientError = require('./exceptions/ClientError');
 
+// authentications
+const authentications = require('./api/authentications');
+const AuthenticationService = require('./services/postgresql/AuthenticationsService');
+const authenticationsValidator = require('./validator/authentications');
+const tokenManager = require('./tokenize/TokenManager');
+
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
+  const authenticationsService = new AuthenticationService();
 
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
+  });
+
+  await server.register([{ plugin: JWT }]);
+
+  // strategy autentikasi jwt
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
   });
 
   await server.register([
@@ -51,6 +78,15 @@ const init = async () => {
         validator: usersValidator,
       },
     },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager,
+        validator: authenticationsValidator,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
@@ -66,9 +102,7 @@ const init = async () => {
         return newResponse;
       }
 
-      if (!response.isServer) {
-        return h.continue;
-      }
+      if (!response.isServer) return h.continue;
 
       const newResponse = h.response({
         status: 'fail',
@@ -86,3 +120,5 @@ const init = async () => {
 };
 
 init();
+
+// truncate users, collaborations, playlists, playlist_song_activities, playlist_songs;
