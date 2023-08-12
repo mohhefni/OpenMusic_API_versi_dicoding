@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class UsersService {
   constructor() {
@@ -55,6 +56,17 @@ class UsersService {
     if (!match) throw new AuthenticationError('Kredensial yang Anda berikan salah');
 
     return id;
+  }
+
+  async verifyUserExists(userId) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1',
+      values: [userId],
+    };
+
+    const { rowCount } = await this._pool.query(query);
+
+    if (!rowCount) throw new NotFoundError('User tidak ditemukan');
   }
 }
 

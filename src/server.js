@@ -26,11 +26,25 @@ const AuthenticationService = require('./services/postgresql/AuthenticationsServ
 const authenticationsValidator = require('./validator/authentications');
 const tokenManager = require('./tokenize/TokenManager');
 
+// playlist, song playlist
+const playlists = require('./api/playlists');
+const PlaylistsService = require('./services/postgresql/PlaylistsService');
+const playlistsValidator = require('./validator/playlists');
+const SongPlaylistService = require('./services/postgresql/SongPlaylistService');
+
+// collaboration
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgresql/CollaborationsService');
+const collaborationsValidator = require('./validator/collaborations');
+
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationService();
+  const playlistsService = new PlaylistsService();
+  const songPlaylistsService = new SongPlaylistService();
+  const collaborationsService = new CollaborationsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -87,6 +101,24 @@ const init = async () => {
         validator: authenticationsValidator,
       },
     },
+    {
+      plugin: playlists,
+      options: {
+        playlistsService,
+        songPlaylistsService,
+        songsService,
+        validator: playlistsValidator,
+      },
+    },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        usersService,
+        playlistsService,
+        validator: collaborationsValidator,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
@@ -121,4 +153,4 @@ const init = async () => {
 
 init();
 
-// truncate users, collaborations, playlists, playlist_song_activities, playlist_songs;
+// truncate users, collaborations, playlists, playlist_song_activities, playlist_songs, songs, collaborations;
