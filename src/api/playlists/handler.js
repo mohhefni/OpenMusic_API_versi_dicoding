@@ -35,7 +35,6 @@ class PlaylistsHandler {
   async getPlaylistHandler(request) {
     const { id: credentialId } = request.auth.credentials;
     const playlists = await this._playlistsService.getAllPlaylists(credentialId);
-
     return {
       status: 'success',
       data: {
@@ -47,7 +46,6 @@ class PlaylistsHandler {
   async deletePlaylistHandler(request) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-
     await this._playlistsService.verifyPlaylistOwner(id, credentialId);
     await this._playlistsService.deletePlaylistById(id);
     return {
@@ -61,12 +59,10 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
-
     await this._songsService.verifySongExists(songId);
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
     await this._songPlaylistsService.addSongToPlaylist(id, songId);
     await this._playlistSongActivitiesService.activitiesSongPlaylist(id, songId, credentialId, 'add');
-
     const response = h.response({
       status: 'success',
       message: 'Lagu berhasil ditambahkan ke playlist',
@@ -78,11 +74,9 @@ class PlaylistsHandler {
   async getPlaylistByIdHandler(request) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-
     await this._playlistsService.verifyPlaylistExists(id);
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
     const playlist = await this._songPlaylistsService.getAllSongFromPlaylist(id);
-
     return {
       status: 'success',
       data: {
@@ -96,11 +90,9 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
     const { songId } = request.payload;
-
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
     await this._songPlaylistsService.deleteSongFromPlaylist(id, songId);
     await this._playlistSongActivitiesService.activitiesSongPlaylist(id, songId, credentialId, 'delete');
-
     return {
       status: 'success',
       message: 'Lagu berhasil dihapus dari playlist.',

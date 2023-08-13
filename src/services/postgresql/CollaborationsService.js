@@ -11,16 +11,12 @@ class CollaborationsService {
 
   async addCollaboration(playlistId, userId) {
     const id = `collaboration-${nanoid(16)}`;
-
     const query = {
       text: 'INSERT INTO collaborations VALUES ($1, $2, $3) RETURNING id',
       values: [id, playlistId, userId],
     };
-
     const { rows, rowCount } = await this._pool.query(query);
-
     if (!rowCount) throw new InvariantError('Collaboration gagal ditambahkan');
-
     return rows[0].id;
   }
 

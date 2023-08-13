@@ -54,7 +54,6 @@ class SongsHandler {
   async deleteSongByIdHandler(request) {
     const { id } = request.params;
     await this._service.deleteSongById(id);
-
     return {
       status: 'success',
       message: 'Lagu berhasil dihapus',

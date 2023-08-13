@@ -11,7 +11,6 @@ class AuthenticationsService {
       text: 'INSERT INTO authentications VALUES ($1)',
       values: [token],
     };
-
     await this._pool.query(query);
   }
 
@@ -21,7 +20,6 @@ class AuthenticationsService {
       values: [token],
     };
     const { rowCount } = await this._pool.query(query);
-
     if (!rowCount) throw new InvariantError('Refresh token tidak valid.');
   }
 
@@ -30,7 +28,6 @@ class AuthenticationsService {
       text: 'DELETE FROM authentications WHERE token = $1',
       values: [token],
     };
-
     await this._pool.query(query);
   }
 }

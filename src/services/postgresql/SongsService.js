@@ -69,9 +69,7 @@ class SongsService {
       text: 'SELECT id FROM songs WHERE id = $1',
       values: [songId],
     };
-
     const { rowCount } = await this._pool.query(query);
-
     if (!rowCount) throw new NotFoundError('Lagu tidak ditemukan');
   }
 }

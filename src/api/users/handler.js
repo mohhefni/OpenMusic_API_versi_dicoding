@@ -15,7 +15,6 @@ class UsersHandler {
       password,
       fullname,
     });
-
     const response = h.response({
       status: 'success',
       message: 'User berhasil ditambahkan',
@@ -23,7 +22,6 @@ class UsersHandler {
         userId,
       },
     });
-
     response.code(201);
     return response;
   }

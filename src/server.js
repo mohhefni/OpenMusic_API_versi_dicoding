@@ -156,4 +156,5 @@ const init = async () => {
 
 init();
 
-// truncate users, collaborations, playlists, playlist_song_activities, playlist_songs, songs, collaborations;
+// truncate users, collaborations, playlists,
+// playlist_song_activities, playlist_songs, songs, collaborations;
